@@ -363,6 +363,48 @@ namespace Mooege.Core.GS.Player
             this.CollectGold();
         }
 
+        private void InitializeNewPlayer()
+        {
+            if (this.ActorType == Actors.ActorType.Player)
+            {
+                switch (Properties.Class)
+                {
+                    case (ToonClass.Barbarian):
+                        Item sword = ItemGenerator.GenerateRandom(this, ItemType.Sword_1H);
+                        Item shield = ItemGenerator.GenerateRandom(this, ItemType.Shield);
+
+                        this.Inventory.PickUp(sword);
+                        this.Inventory.PickUp(shield);
+
+                        break;
+                    case (ToonClass.DemonHunter):
+                        //ToDo: Ensure this is the right cbow, change description/name(?), and add bolts?
+                        Item cBow = ItemGenerator.CreateItem(this, new ItemDefinition(6610, "Crossbow_001", "Description Here"));
+                        this.Inventory.PickUp(cBow);
+
+                        break;
+                    case (ToonClass.WitchDoctor):
+                        Item scepter = ItemGenerator.GenerateRandom(this, ItemType.Scepter);
+
+                        this.Inventory.PickUp(scepter);
+
+                        break;
+                    case (ToonClass.Wizard):
+                        Item staff = ItemGenerator.GenerateRandom(this, ItemType.CombatStaff_2H);
+
+                        this.Inventory.PickUp(staff);
+
+                        break;
+                    case (ToonClass.Monk):
+                        Item knuckles = ItemGenerator.GenerateRandom(this, ItemType.FistWeapon_1H);
+
+                        this.Inventory.PickUp(knuckles);
+
+                        break;
+                }
+            }
+        }
+
         private void CollectGold()
         {
             var actorList = this.World.GetActorsInRange(this.Position.X, this.Position.Y, this.Position.Z, 20f);
@@ -404,6 +446,9 @@ namespace Mooege.Core.GS.Player
             var attribs = new GameAttributeMap();
             attribs[GameAttribute.Hitpoints_Healed_Target] = 76f;
             attribs.SendMessage(InGameClient, this.DynamicID);
+
+            //Give player items
+            InitializeNewPlayer();
         }
 
         public override void OnLeave(World world)
