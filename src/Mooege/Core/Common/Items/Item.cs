@@ -136,6 +136,17 @@ namespace Mooege.Core.Common.Items
             return (itemType == ItemType.Ring || itemType == ItemType.Belt || itemType == ItemType.Amulet);
         }
 
+        public static bool IsArmor(ItemType itemType)
+        {
+            return (itemType == ItemType.Helm ||
+                itemType == ItemType.Gloves ||
+                itemType == ItemType.Boots ||
+                itemType == ItemType.Shoulders ||
+                itemType == ItemType.Pants ||
+                itemType == ItemType.ChestArmor ||
+                itemType == ItemType.Bracers);
+        }
+
         public static bool IsRuneOrJewel(ItemType itemType)
         {
             return (itemType == ItemType.Amethyst || itemType == ItemType.Ruby || itemType == ItemType.Emerald || itemType == ItemType.Topaz || itemType == ItemType.Rune);

@@ -86,7 +86,12 @@ namespace Mooege.Core.GS.Player
             // TODO: Autoequip when equipment slot is empty
 
             bool success = false;
-            if (!_inventoryStash.HasFreeSpace(item))
+
+            if (AttemptAutoEquip(item))
+            {
+                //do nothing... will equip if possible
+            }
+            else if (!_inventoryStash.HasFreeSpace(item))
             {
                 // Inventory full
                 _owner.InGameClient.SendMessage(new ACDPickupFailedMessage()
@@ -107,6 +112,115 @@ namespace Mooege.Core.GS.Player
             AcceptMoveRequest(item);
             return success;
         }
+
+        /// <summary>
+        /// Handles auto-equipping of items on pickup. Returns true if they were able to be equipped.
+        /// </summary>
+        private bool AttemptAutoEquip(Item item)
+        {
+            bool result = false;
+
+            if (Item.IsWeapon(item.ItemType))
+            {
+                if (_equipment.GetEquipment(EquipmentSlotId.Main_Hand) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Main_Hand))
+                {
+                    _equipment.EquipItem(item, (int)EquipmentSlotId.Main_Hand);
+                    result = true;
+                }
+                else if (!Item.Is2H(item.ItemType) && _equipment.GetEquipment(EquipmentSlotId.Off_Hand) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Off_Hand))
+                {
+                    _equipment.EquipItem(item, (int)EquipmentSlotId.Off_Hand);
+                    result = true;
+                }
+            }
+            else if (Item.IsArmor(item.ItemType) || Item.IsAccessory(item.ItemType))
+            {
+                switch (item.ItemType)
+                {
+                    case ItemType.ChestArmor:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Chest) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Chest))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Chest);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Helm:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Helm) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Helm))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Helm);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Shoulders:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Shoulders) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Shoulders))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Shoulders);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Bracers:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Bracers) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Bracers))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Bracers);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Gloves:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Hands) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Hands))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Hands);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Boots:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Feet) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Feet))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Feet);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Pants:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Legs) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Legs))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Legs);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Amulet:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Amulett) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Amulett))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Amulett);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Belt:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Belt) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Belt))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Belt);
+                            result = true;
+                        }
+                        break;
+                    case ItemType.Ring:
+                        if (_equipment.GetEquipment(EquipmentSlotId.Ring_left) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Ring_left))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Ring_left);
+                            result = true;
+                        }
+                        else if (_equipment.GetEquipment(EquipmentSlotId.Ring_right) == null && IsValidEquipmentRequest(item, (int)EquipmentSlotId.Ring_right))
+                        {
+                            _equipment.EquipItem(item, (int)EquipmentSlotId.Ring_right);
+                            result = true;
+                        }
+                        break;
+                }
+            }
+
+            if(result)
+                SendVisualInventory(this._owner);
+
+            return result;
+        }
+
 
         /// <summary>
         /// Handles a request to move an item within the inventory.
